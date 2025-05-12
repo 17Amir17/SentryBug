@@ -7,16 +7,23 @@
  * @see https://trpc.io/docs/v11/router
  * @see https://trpc.io/docs/v11/procedures
  */
-import { initTRPC } from '@trpc/server';
-import { transformer } from '../utils/transformer';
+import { initTRPC } from "@trpc/server";
+import { transformer } from "../utils/transformer";
+import * as Sentry from "@sentry/nextjs";
 
 const t = initTRPC.create({
   transformer,
 });
 
+const sentryMiddleware = t.middleware(
+  Sentry.trpcMiddleware({
+    attachRpcInput: true,
+  })
+);
+
 /**
  * Unprotected procedure
  **/
-export const publicProcedure = t.procedure;
+export const publicProcedure = t.procedure.use(sentryMiddleware);
 
 export const router = t.router;

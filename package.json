@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@sentry/nextjs": "^9.17.0",
     "@tanstack/react-query": "^5.74.7",
     "@trpc/client": "npm:@trpc/client",
     "@trpc/next": "npm:@trpc/next",

@@ -4,16 +4,25 @@
  */
 import * as trpcNext from "@trpc/server/adapters/next";
 import { publicProcedure, router } from "~/server/trpc";
+import * as Sentry from "@sentry/nextjs";
+import * as z from "zod";
 
 const appRouter = router({
-  getCats: publicProcedure.query(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return ["Whiskers", "Mittens", "Shadow"];
-  }),
-  getDogs: publicProcedure.query(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return ["Rover", "Fido", "Spot"];
-  }),
+  getCats: publicProcedure
+    .input(
+      z.object({
+        shouldThrow: z.boolean().optional(),
+        catRequestId: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
+      Sentry.setTag("catRequestId", input.catRequestId);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (input.shouldThrow) {
+        throw new Error("Error triggered by shouldThrow in getCats");
+      }
+      return ["Whiskers", "Mittens", "Shadow"];
+    }),
 });
 
 export type AppRouter = typeof appRouter;
