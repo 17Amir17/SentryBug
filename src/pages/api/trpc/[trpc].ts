@@ -21,6 +21,7 @@ const appRouter = router({
       if (input.shouldThrow) {
         throw new Error("Error triggered by shouldThrow in getCats");
       }
+      Sentry.captureMessage("getCats success");
       return ["Whiskers", "Mittens", "Shadow"];
     }),
 });
