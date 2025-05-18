@@ -18,15 +18,18 @@ const appRouter = router({
     .query(async ({ input }) => {
       return Sentry.withScope(async (scope) => {
         scope.setTag("catRequestId", input.catRequestId);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        if (input.shouldThrow) {
-          try {
-            throw new Error("Error triggered by shouldThrow in getCats");
-          } catch (error) {
-            scope.captureException(error);
-            return;
-          }
+        try {
+          await new Promise((res, rej) =>
+            setTimeout(() => {
+              if (input.shouldThrow)
+                rej("Error triggered by shouldThrow in getCats");
+            }, 1000)
+          );
+        } catch (error) {
+          scope.captureException(error);
+          return;
         }
+
         scope.captureMessage("getCats success");
         return ["Whiskers", "Mittens", "Shadow"];
       });
